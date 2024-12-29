@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:convert';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: AnimeHomeScreen(),
+      home: const AnimeHomeScreen(),
     );
   }
 }
@@ -118,7 +120,7 @@ class _AnimeHomeScreenState extends State<AnimeHomeScreen> {
               ? const Center(child: CircularProgressIndicator())
               : Expanded(
                   child: _animeList.isEmpty // Check if no results found
-                      ? Center(child: Text('No results found'))
+                      ? const Center(child: Text('No results found'))
                       : ListView.builder(
                           itemCount: _animeList.length,
                           itemBuilder: (context, index) {
@@ -161,7 +163,7 @@ class _AnimeHomeScreenState extends State<AnimeHomeScreen> {
 class AnimeDetailScreen extends StatefulWidget {
   final String animeId;
 
-  AnimeDetailScreen({required this.animeId});
+  const AnimeDetailScreen({super.key, required this.animeId});
 
   @override
   _AnimeDetailScreenState createState() => _AnimeDetailScreenState();
@@ -211,7 +213,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => AnimeWatchScreen(
-            episodeData: episodeData,
+            videoUrl: episodeData['sources'][0]['url'],
           ),
         ),
       );
@@ -227,7 +229,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
         title: Text(_isLoading ? 'Loading...' : _animeDetails['title']),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -242,78 +244,78 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
                       fit: BoxFit
                           .fitWidth, // Adjust height to maintain aspect ratio
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
                       _animeDetails['title'],
                       style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       _animeDetails['description'],
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
                     // Display genres in boxes
-                    Text(
+                    const Text(
                       'Genres:',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Wrap(
                       spacing: 8.0,
                       runSpacing: 4.0,
                       children: _animeDetails['genres'].map<Widget>((genre) {
                         return Container(
                           padding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 0, 170, 255),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             genre,
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                            style: const TextStyle(color: Colors.white, fontSize: 14),
                           ),
                         );
                       }).toList(),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Other details
                     Text(
                       'Total Episodes: ${_animeDetails['totalEpisodes']}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'Release Date: ${_animeDetails['releaseDate']}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'Sub or Dub: ${_animeDetails['subOrDub']}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'Status: ${_animeDetails['status']}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'Type: ${_animeDetails['type']}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'Other Names: ${_animeDetails['otherName']}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
                     // Expandable episodes list
                     ExpansionTile(
@@ -344,9 +346,9 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
 }
 
 class AnimeWatchScreen extends StatefulWidget {
-  final dynamic episodeData;
+  final String videoUrl; // Pass the .m3u8 URL
 
-  AnimeWatchScreen({required this.episodeData});
+  const AnimeWatchScreen({super.key, required this.videoUrl});
 
   @override
   _AnimeWatchScreenState createState() => _AnimeWatchScreenState();
@@ -354,81 +356,61 @@ class AnimeWatchScreen extends StatefulWidget {
 
 class _AnimeWatchScreenState extends State<AnimeWatchScreen> {
   late VideoPlayerController _controller;
-  bool _isLoading = true;
-  late String _videoUrl;
+  late ChewieController _chewieController;
+  final bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    // Choose the highest quality stream (can be customized)
-    _videoUrl = widget.episodeData['sources'][3]['url']; // 1080p as default
-    _initializeVideoPlayer();
-  }
 
-  Future<void> _initializeVideoPlayer() async {
-    _controller = VideoPlayerController.network(_videoUrl);
-    await _controller.initialize();
-    setState(() {
-      _isLoading = false;
-    });
+    // Lock screen orientation to landscape
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft]);
+
+    // Initialize the video player controller with the provided .m3u8 URL
+    _controller = VideoPlayerController.network(widget.videoUrl)
+      ..initialize().then((_) {
+        setState(() {}); // Update UI when video is ready to play
+      });
+
+    // Initialize Chewie controller with custom settings
+    _chewieController = ChewieController(
+      videoPlayerController: _controller,
+      autoPlay: true,
+      looping: true,
+      showControlsOnInitialize: true,
+      customControls:
+          const MaterialControls(), // Default controls (play/pause, seek bar, etc.)
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
+    _controller.dispose(); // Dispose controller when the screen is destroyed
+
+    // Reset the preferred orientations to portrait when leaving the screen
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+    _controller.dispose(); // Dispose the video player controller
+    _chewieController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.episodeData['title'] ?? 'Anime Episode'),
+      backgroundColor: Colors.black, // Set the background to black
+      body: Center(
+        child: _controller.value.isInitialized
+            ? Chewie(
+                controller:
+                    _chewieController, // Use Chewie controller for video playback with controls
+              )
+            : const Center(
+                child:
+                    CircularProgressIndicator()), // Show loading spinner while video loads
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                ),
-                VideoProgressIndicator(
-                  _controller,
-                  allowScrubbing: true,
-                  colors: VideoProgressColors(
-                    playedColor: Colors.blue,
-                    bufferedColor: Colors.grey,
-                    backgroundColor: Colors.black,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Quality selection dropdown or buttons for different qualities
-                      DropdownButton<String>(
-                        value: _videoUrl,
-                        items: widget.episodeData['sources']
-                            .map<DropdownMenuItem<String>>((source) {
-                          return DropdownMenuItem<String>(
-                            value: source['url'],
-                            child: Text('${source['quality']}'),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _videoUrl = value!;
-                            _initializeVideoPlayer();
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
     );
   }
 }
