@@ -247,7 +247,7 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => AnimeWatchScreen(
-            videoUrl: episodeData['sources'][0]['url'],
+            videoUrl: episodeData['sources'][3]['url'],
           ),
         ),
       );
