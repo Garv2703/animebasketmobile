@@ -247,14 +247,14 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
                     const SizedBox(height: 16),
                     Text(
                       _animeDetails['title'],
-                      style:
-                          const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _animeDetails['description'],
-                      style:
-                          const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
 
@@ -270,15 +270,16 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
                       runSpacing: 4.0,
                       children: _animeDetails['genres'].map<Widget>((genre) {
                         return Container(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 0, 170, 255),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             genre,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
                           ),
                         );
                       }).toList(),
