@@ -392,7 +392,6 @@ class AnimeWatchScreen extends StatefulWidget {
 class _AnimeWatchScreenState extends State<AnimeWatchScreen> {
   late VideoPlayerController _controller;
   late ChewieController _chewieController;
-  final bool _isPlaying = false;
 
   @override
   void initState() {
