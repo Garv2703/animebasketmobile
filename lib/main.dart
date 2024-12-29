@@ -14,8 +14,31 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Anime Search',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.blueGrey[900],
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+        ),
+        scaffoldBackgroundColor: Colors.black,
+        cardColor: Colors.grey[850],
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          bodyMedium:
+              TextStyle(color: Colors.white), // Replacement for bodyText1
+          bodySmall:
+              TextStyle(color: Colors.white70), // Replacement for bodyText2
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.grey,
+          labelStyle: TextStyle(color: Colors.white70),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white70),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       home: const AnimeHomeScreen(),
     );
