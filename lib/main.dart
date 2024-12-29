@@ -25,17 +25,24 @@ class MyApp extends StatelessWidget {
         textTheme: const TextTheme(
           titleLarge: TextStyle(
               color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-          bodyMedium:
-              TextStyle(color: Colors.white), // Replacement for bodyText1
-          bodySmall:
-              TextStyle(color: Colors.white70), // Replacement for bodyText2
+          bodyMedium: TextStyle(color: Colors.white),
+          bodySmall: TextStyle(color: Colors.white70),
         ),
-        inputDecorationTheme: const InputDecorationTheme(
+        inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.grey,
-          labelStyle: TextStyle(color: Colors.white70),
+          fillColor: Colors.grey[850], // Matches card color
+          labelStyle: const TextStyle(color: Colors.white70),
           border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white70),
+            borderRadius: BorderRadius.circular(25.0), // Rounded corners
+            borderSide: const BorderSide(color: Colors.transparent),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0), // Rounded corners
+            borderSide: const BorderSide(color: Colors.transparent),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25.0), // Rounded corners
+            borderSide: const BorderSide(color: Colors.white),
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -120,64 +127,68 @@ class _AnimeHomeScreenState extends State<AnimeHomeScreen> {
       appBar: AppBar(
         title: const Text('Anime Basket'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Search for Anime',
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    _searchAnime(_searchController.text);
-                  },
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+        },
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Search for Anime',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      _searchAnime(_searchController.text);
+                    },
+                  ),
                 ),
+                onSubmitted: _searchAnime,
               ),
-              onSubmitted: _searchAnime,
             ),
-          ),
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Expanded(
-                  child: _animeList.isEmpty // Check if no results found
-                      ? const Center(child: Text('No results found'))
-                      : ListView.builder(
-                          itemCount: _animeList.length,
-                          itemBuilder: (context, index) {
-                            final anime = _animeList[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              child: ListTile(
-                                leading: Image.network(
-                                  anime['image'],
-                                  width: 50,
-                                  height: 75,
-                                  fit: BoxFit.cover,
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: _animeList.isEmpty
+                        ? const Center(child: Text('No results found'))
+                        : ListView.builder(
+                            itemCount: _animeList.length,
+                            itemBuilder: (context, index) {
+                              final anime = _animeList[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                child: ListTile(
+                                  leading: Image.network(
+                                    anime['image'],
+                                    width: 50,
+                                    height: 75,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  title: Text(anime['title']),
+                                  subtitle: _searchController.text.isEmpty
+                                      ? Text(anime['genres'].join(', '))
+                                      : null,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AnimeDetailScreen(
+                                            animeId: anime['id']),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                title: Text(anime['title']),
-                                subtitle: _searchController.text.isEmpty
-                                    ? Text(anime['genres'].join(', '))
-                                    : null, // Hide genres while searching
-                                onTap: () {
-                                  // Navigate to the anime detail screen
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AnimeDetailScreen(
-                                          animeId: anime['id']),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                ),
-        ],
+                              );
+                            },
+                          ),
+                  ),
+          ],
+        ),
       ),
     );
   }
